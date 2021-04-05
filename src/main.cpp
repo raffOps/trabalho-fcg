@@ -106,6 +106,9 @@ int tecla_s = 0;
 int tecla_a = 0;
 int tecla_d = 0;
 
+bool is_look_at = true;
+
+
 
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
 // pressionado no momento atual. Veja função MouseButtonCallback().
@@ -288,6 +291,10 @@ int main()
 
         // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
+        
+        
+        
+        
         glm::vec4 camera_position_c  = glm::vec4(movimentacao_d-movimentacao_a, 3, movimentacao_s-movimentacao_w+3, 1.0f); 
         glm::vec4 camera_lookat_l    = glm::vec4(x+movimentacao_d-movimentacao_a, y, -z+movimentacao_s-movimentacao_w, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
         glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c;
@@ -1052,6 +1059,14 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     // Se o usuário pressionar a tecla ESC, fechamos a janela.
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
+
+    if (key == GLFW_KEY_C && action == GLFW_PRESS)
+        if (is_look_at) {
+            is_look_at = false;
+        }
+        else {
+            is_look_at = true;
+        }
 
     // O código abaixo implementa a seguinte lógica:
     //   Se apertar tecla X       então g_AngleX += delta;
