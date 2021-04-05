@@ -360,7 +360,14 @@ int main()
                 // suas coordenadas no espaço global (World Coordinates) serão
                 // *exatamente iguais* a suas coordenadas no espaço do modelo
                 // (Model Coordinates).
-                model = Matrix_Identity();
+                // model = Matrix_Identity();
+                model = Matrix_Translate(movimentacao_d - movimentacao_a, 
+                                         0,
+                                        movimentacao_s - movimentacao_w);
+                // model = Matrix_Scale(movimentacao_w, movimentacao_w, movimentacao_w)*w
+                //         * Matrix_Scale(movimentacao_s, movimentacao_s, movimentacao_s)*w
+                //         * Matrix_Scale(movimentacao_a, movimentacao_a, movimentacao_a)*u
+                //         * Matrix_Scale(movimentacao_d, movimentacao_d, movimentacao_d)*u
             }
             else if ( i == 2 )
             {
