@@ -280,29 +280,31 @@ int main()
         float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
         float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
 
-        // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
-        // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-        glm::vec4 camera_position_c  = glm::vec4(0.0f, 0.5f, 2.5f, 0.0f); 
-        glm::vec4 camera_view_vector    = glm::vec4(x,y,-z,0.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-        glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
-
-
-        glm::vec4 w = -camera_view_vector;
-        glm::vec4 u = crossproduct(camera_up_vector, w);
-
-        // Normalizamos os vetores u e w
-        w = w / norm(w);
-        u = u / norm(u);
-
+        
         float movimentacao_w = tecla_w * 0.05;
         float movimentacao_a = tecla_a * 0.05;
         float movimentacao_s = tecla_s * 0.05;
         float movimentacao_d = tecla_d * 0.05;
 
-        camera_position_c = camera_position_c - Matrix_Scale(movimentacao_w, movimentacao_w, movimentacao_w)*w;
-        camera_position_c = camera_position_c + Matrix_Scale(movimentacao_s, movimentacao_s, movimentacao_s)*w;
-        camera_position_c = camera_position_c - Matrix_Scale(movimentacao_a, movimentacao_a, movimentacao_a)*u;
-        camera_position_c = camera_position_c + Matrix_Scale(movimentacao_d, movimentacao_d, movimentacao_d)*u;
+        // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
+        // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
+        glm::vec4 camera_position_c  = glm::vec4(movimentacao_d-movimentacao_a, 3, movimentacao_s-movimentacao_w+3, 1.0f); 
+        glm::vec4 camera_lookat_l    = glm::vec4(x+movimentacao_d-movimentacao_a, y, -z+movimentacao_s-movimentacao_w, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+        glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c;
+        glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+
+
+        // glm::vec4 w = -camera_view_vector;
+        // glm::vec4 u = crossproduct(camera_up_vector, w);
+
+        // Normalizamos os vetores u e w
+        // w = w / norm(w);
+        // u = u / norm(u);
+
+        // camera_position_c = camera_position_c - Matrix_Scale(movimentacao_w, movimentacao_w, movimentacao_w)*w;
+        // camera_position_c = camera_position_c + Matrix_Scale(movimentacao_s, movimentacao_s, movimentacao_s)*w;
+        // camera_position_c = camera_position_c - Matrix_Scale(movimentacao_a, movimentacao_a, movimentacao_a)*u;
+        // camera_position_c = camera_position_c + Matrix_Scale(movimentacao_d, movimentacao_d, movimentacao_d)*u;
 
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
