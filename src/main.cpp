@@ -107,6 +107,7 @@ int tecla_a = 0;
 int tecla_d = 0;
 
 bool is_look_at = true;
+bool is_free_camera = false;
 
 
 
@@ -291,31 +292,43 @@ int main()
 
         // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
+
+        glm::vec4 camera_position_c;
+        glm::vec4 camera_lookat_l;
+        glm::vec4 camera_view_vector;
+        glm::vec4 camera_up_vector;
         
-        
-        
-        
-        glm::vec4 camera_position_c  = glm::vec4(movimentacao_d-movimentacao_a, 3, movimentacao_s-movimentacao_w+3, 1.0f); 
-        glm::vec4 camera_lookat_l    = glm::vec4(x+movimentacao_d-movimentacao_a, y, -z+movimentacao_s-movimentacao_w, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-        glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c;
-        glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+        if(is_look_at) {
+            camera_position_c  = glm::vec4(movimentacao_d-movimentacao_a, 3, movimentacao_s-movimentacao_w+3, 1.0f); 
+            camera_lookat_l    = glm::vec4(x+movimentacao_d-movimentacao_a, y, -z+movimentacao_s-movimentacao_w, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            camera_view_vector = camera_lookat_l - camera_position_c;
+            camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+        }
+
+        else {
+            camera_position_c  = glm::vec4(0.0f, 0.5f, 2.5f, 0.0f); 
+            camera_view_vector    = glm::vec4(x,y,-z,0.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
 
-        // glm::vec4 w = -camera_view_vector;
-        // glm::vec4 u = crossproduct(camera_up_vector, w);
+            glm::vec4 w = -camera_view_vector;
+            glm::vec4 u = crossproduct(camera_up_vector, w);
 
-        // Normalizamos os vetores u e w
-        // w = w / norm(w);
-        // u = u / norm(u);
+            // Normalizamos os vetores u e w
+            w = w / norm(w);
+            u = u / norm(u);
 
-        // camera_position_c = camera_position_c - Matrix_Scale(movimentacao_w, movimentacao_w, movimentacao_w)*w;
-        // camera_position_c = camera_position_c + Matrix_Scale(movimentacao_s, movimentacao_s, movimentacao_s)*w;
-        // camera_position_c = camera_position_c - Matrix_Scale(movimentacao_a, movimentacao_a, movimentacao_a)*u;
-        // camera_position_c = camera_position_c + Matrix_Scale(movimentacao_d, movimentacao_d, movimentacao_d)*u;
+            float movimentacao_w = tecla_w * 0.05;
+            float movimentacao_a = tecla_a * 0.05;
+            float movimentacao_s = tecla_s * 0.05;
+            float movimentacao_d = tecla_d * 0.05;
 
+            camera_position_c = camera_position_c - Matrix_Scale(movimentacao_w, movimentacao_w, movimentacao_w)*w;
+            camera_position_c = camera_position_c + Matrix_Scale(movimentacao_s, movimentacao_s, movimentacao_s)*w;
+            camera_position_c = camera_position_c - Matrix_Scale(movimentacao_a, movimentacao_a, movimentacao_a)*u;
+            camera_position_c = camera_position_c + Matrix_Scale(movimentacao_d, movimentacao_d, movimentacao_d)*u;
 
-        // Computamos a matriz "View" utilizando os parâmetros da câmera para
-        // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
+        }
         glm::mat4 view = Matrix_Camera_View(camera_position_c, camera_view_vector, camera_up_vector);
 
         // Agora computamos a matriz de Projeção.
@@ -362,7 +375,7 @@ int main()
             // slides 2-14 e 184-190 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
             glm::mat4 model;
 
-            if (i == 1)
+            if (i == 1 && is_look_at==true)
             {
                 // A primeira cópia do cubo não sofrerá nenhuma transformação
                 // de modelagem. Portanto, sua matriz "model" é a identidade, e
@@ -392,7 +405,7 @@ int main()
                 // ordem) seguindo o sistema de ângulos de Euler, e após uma
                 // translação em X. Veja slides 106-107 do documento Aula_07_Transformacoes_Geometricas_3D.pdf.
                 model = Matrix_Translate(-2.0f, 0.0f, 0.0f) // QUARTO translação
-                      * Matrix_Rotate_Z(g_AngleZ)  // TERCEIRO rotação Z de Euler
+                      * Matrix_Rotate_Z(-g_AngleZ)  // TERCEIRO rotação Z de Euler
                       * Matrix_Rotate_Y(g_AngleY)  // SEGUNDO rotação Y de Euler
                       * Matrix_Rotate_X(g_AngleX); // PRIMEIRO rotação X de Euler
 
@@ -1060,13 +1073,15 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 
-    if (key == GLFW_KEY_C && action == GLFW_PRESS)
-        if (is_look_at) {
-            is_look_at = false;
-        }
-        else {
-            is_look_at = true;
-        }
+    if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+        is_look_at = true;
+        is_free_camera = false;
+    }
+
+    if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+        is_free_camera = true;
+        is_look_at = false;
+    }
 
     // O código abaixo implementa a seguinte lógica:
     //   Se apertar tecla X       então g_AngleX += delta;
