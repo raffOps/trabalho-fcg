@@ -390,11 +390,7 @@ int main()
         glm::vec4 camera_up_vector;
         
         if(is_look_at) {
-<<<<<<< HEAD
             camera_position_c  = glm::vec4(x+movimentacao_d_objeto-movimentacao_a_camera,2,z+movimentacao_s_camera-movimentacao_w_camera, 1.0f); 
-=======
-            camera_position_c  = glm::vec4(x+movimentacao_d_objeto-movimentacao_a_camera,y,z+movimentacao_s_camera-movimentacao_w_camera, 1.0f); 
->>>>>>> parent of e69b509... setado eixo y estatico em 3 para a camera em look-at
             camera_lookat_l    = glm::vec4(movimentacao_d_objeto-movimentacao_a_camera, 0, movimentacao_s_camera-movimentacao_w_camera, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_view_vector = camera_lookat_l - camera_position_c;
             camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
