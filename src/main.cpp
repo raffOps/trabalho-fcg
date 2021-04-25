@@ -336,6 +336,13 @@ int main()
     glm::mat4 the_model;
     glm::mat4 the_view;
 
+    // Fora do laço principal, pois queremos somente ATUALIZAR a posição da
+    // câmera a cada iteração.
+    glm::vec4 camera_position_c;
+    glm::vec4 camera_lookat_l;
+    glm::vec4 camera_view_vector;
+    glm::vec4 camera_up_vector;
+        
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
@@ -384,11 +391,6 @@ int main()
         // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
 
-        glm::vec4 camera_position_c;
-        glm::vec4 camera_lookat_l;
-        glm::vec4 camera_view_vector;
-        glm::vec4 camera_up_vector;
-        
         if(is_look_at) {
             camera_position_c  = glm::vec4(x+movimentacao_d_objeto-movimentacao_a_camera,2,z+movimentacao_s_camera-movimentacao_w_camera, 1.0f); 
             camera_lookat_l    = glm::vec4(movimentacao_d_objeto-movimentacao_a_camera, 0, movimentacao_s_camera-movimentacao_w_camera, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
@@ -397,7 +399,9 @@ int main()
         }
 
         else {
-            camera_position_c  = glm::vec4(0.0f, 2.5, 4.5f, 0.0f); 
+            // O valor da câmera será atualizado a cada iteração, a partir da
+            // posição no instante (iteração) anterior.
+            // camera_position_c  = glm::vec4(0.0f, 2.5, 4.5f, 0.0f); 
             camera_view_vector    = glm::vec4(x,y,-z,0.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
@@ -409,6 +413,9 @@ int main()
             w = w / norm(w);
             u = u / norm(u);
 
+            // A matriz de escalamento funciona aqui, mas como é um escalamento
+            // uniforme, poderiam utilizar diretamente uma multiplicação por
+            // escalar: "movimentacao_w_camera*w"
             camera_position_c = camera_position_c - Matrix_Scale(movimentacao_w_camera, movimentacao_w_camera, movimentacao_w_camera)*w;
             camera_position_c = camera_position_c + Matrix_Scale(movimentacao_s_camera, movimentacao_s_camera, movimentacao_s_camera)*w;
             camera_position_c = camera_position_c - Matrix_Scale(movimentacao_a_camera, movimentacao_a_camera, movimentacao_a_camera)*u;
@@ -1698,10 +1705,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     if (key == GLFW_KEY_F && action == GLFW_PRESS) {
         is_look_at = false;
-        tecla_a_camera = tecla_a_objeto;
-        tecla_d_camera = tecla_d_objeto;
-        tecla_w_camera = tecla_w_objeto;
-        tecla_s_camera = tecla_s_objeto;
+        // Tratamos estas variáveis como booleanas, admitindo somente valores 0 ou 1.
+        tecla_a_camera = 0;
+        tecla_d_camera = 0;
+        tecla_w_camera = 0;
+        tecla_s_camera = 0;
         g_CameraTheta = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
         g_CameraPhi = 0.0f;   // Ângulo em relação ao eixo Y
         g_CameraDistance = 2.5f; // Distância da câmera para a origem
@@ -1734,7 +1742,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     if (key == GLFW_KEY_W)
     {
-        tecla_w_camera += 1;
+        // Variável booleana: igual a 1 se a tecla W está pressionada, caso contrário igual a 0.
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+            tecla_w_camera = 1;
+        else
+            tecla_w_camera = 0;
+
         if (is_look_at)
             {
                 tecla_w_objeto += 1;
@@ -1743,7 +1756,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     if (key == GLFW_KEY_S)
     {
-        tecla_s_camera += 1;
+        // Variável booleana: igual a 1 se a tecla S está pressionada, caso contrário igual a 0.
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+            tecla_s_camera = 1;
+        else
+            tecla_s_camera = 0;
         if (is_look_at)
             {
                 tecla_s_objeto += 1;
@@ -1752,7 +1769,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     if (key == GLFW_KEY_A)
     {
-        tecla_a_camera += 1;
+        // Variável booleana: igual a 1 se a tecla A está pressionada, caso contrário igual a 0.
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+            tecla_a_camera = 1;
+        else
+            tecla_a_camera = 0;
         if (is_look_at)
             {
                 tecla_a_objeto += 1;
@@ -1761,7 +1782,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     if (key == GLFW_KEY_D)
     {
-        tecla_d_camera += 1;
+        // Variável booleana: igual a 1 se a tecla D está pressionada, caso contrário igual a 0.
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+            tecla_d_camera = 1;
+        else
+            tecla_d_camera = 0;
         if (is_look_at)
             {
                 tecla_d_objeto += 1;
