@@ -185,6 +185,20 @@ GLint view_uniform;
 GLint projection_uniform;
 GLint object_id_uniform;
 
+int tecla_w_objeto = 0;
+int tecla_s_objeto = 0;
+int tecla_a_objeto = 0;
+int tecla_d_objeto = 0;
+
+
+int tecla_w_camera = 0;
+int tecla_s_camera = 0;
+int tecla_a_camera = 0;
+int tecla_d_camera = 0;
+
+
+bool is_look_at = true;
+
 int main(int argc, char* argv[])
 {
     // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
@@ -324,13 +338,48 @@ int main(int argc, char* argv[])
         float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
         float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
 
+        float movimentacao_w_objeto = tecla_w_objeto * 0.05;
+        float movimentacao_a_objeto = tecla_a_objeto * 0.05;
+        float movimentacao_s_objeto = tecla_s_objeto * 0.05;
+        float movimentacao_d_objeto = tecla_d_objeto * 0.05;
+
+        float movimentacao_w_camera = tecla_w_camera * 0.05;
+        float movimentacao_a_camera = tecla_a_camera * 0.05;
+        float movimentacao_s_camera = tecla_s_camera * 0.05;
+        float movimentacao_d_camera = tecla_d_camera * 0.05;
         // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-        glm::vec4 camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
-        glm::vec4 camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-        glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
-        glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
+        glm::vec4 camera_position_c;
+        glm::vec4 camera_lookat_l;
+        glm::vec4 camera_view_vector;
+        glm::vec4 camera_up_vector;
+        
+        if(is_look_at) {
+            camera_position_c  = glm::vec4(x+movimentacao_d_objeto-movimentacao_a_camera,3,z+movimentacao_s_camera-movimentacao_w_camera, 1.0f); 
+            camera_lookat_l    = glm::vec4(movimentacao_d_objeto-movimentacao_a_camera, 0, movimentacao_s_camera-movimentacao_w_camera, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            camera_view_vector = camera_lookat_l - camera_position_c;
+            camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+        }
+
+        else {
+            camera_position_c  = glm::vec4(0.0f, 2.5, 4.5f, 1.0f); 
+            camera_view_vector    = glm::vec4(x,y,-z,0.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+
+
+            glm::vec4 w = -camera_view_vector;
+            glm::vec4 u = crossproduct(camera_up_vector, w);
+
+            // Normalizamos os vetores u e w
+            w = w / norm(w);
+            u = u / norm(u);
+
+            camera_position_c = camera_position_c - Matrix_Scale(movimentacao_w_camera, movimentacao_w_camera, movimentacao_w_camera)*w;
+            camera_position_c = camera_position_c + Matrix_Scale(movimentacao_s_camera, movimentacao_s_camera, movimentacao_s_camera)*w;
+            camera_position_c = camera_position_c - Matrix_Scale(movimentacao_a_camera, movimentacao_a_camera, movimentacao_a_camera)*u;
+            camera_position_c = camera_position_c + Matrix_Scale(movimentacao_d_camera, movimentacao_d_camera, movimentacao_d_camera)*u;
+        }
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
         glm::mat4 view = Matrix_Camera_View(camera_position_c, camera_view_vector, camera_up_vector);
@@ -1109,6 +1158,66 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         LoadShadersFromFiles();
         fprintf(stdout,"Shaders recarregados!\n");
         fflush(stdout);
+    }
+
+
+    if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+        is_look_at = true;
+        tecla_a_camera = tecla_a_objeto;
+        tecla_d_camera = tecla_d_objeto;
+        tecla_w_camera = tecla_w_objeto;
+        tecla_s_camera = tecla_s_objeto;
+        g_CameraTheta = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
+        g_CameraPhi = 0.0f;   // Ângulo em relação ao eixo Y
+        g_CameraDistance = 2.5f; // Distância da câmera para a origem
+    }
+
+    if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+        is_look_at = false;
+        tecla_a_camera = tecla_a_objeto;
+        tecla_d_camera = tecla_d_objeto;
+        tecla_w_camera = tecla_w_objeto;
+        tecla_s_camera = tecla_s_objeto;
+        g_CameraTheta = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
+        g_CameraPhi = 0.0f;   // Ângulo em relação ao eixo Y
+        g_CameraDistance = 2.5f; // Distância da câmera para a origem
+
+    }
+
+        if (key == GLFW_KEY_W)
+    {
+        tecla_w_camera += 1;
+        if (is_look_at)
+            {
+                tecla_w_objeto += 1;
+            }    
+    }
+
+    if (key == GLFW_KEY_S)
+    {
+        tecla_s_camera += 1;
+        if (is_look_at)
+            {
+                tecla_s_objeto += 1;
+            } 
+    }
+
+    if (key == GLFW_KEY_A)
+    {
+        tecla_a_camera += 1;
+        if (is_look_at)
+            {
+                tecla_a_objeto += 1;
+            } 
+    }
+
+    if (key == GLFW_KEY_D)
+    {
+        tecla_d_camera += 1;
+        if (is_look_at)
+            {
+                tecla_d_objeto += 1;
+            } 
     }
 }
 
