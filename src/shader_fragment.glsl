@@ -39,14 +39,12 @@ void main()
     // normais de cada vértice.
     vec4 n = normalize(normal);
 
-    vec4 spotlight = vec4(0.0,2.0,1.0,1.0);
     // Vetor que define o sentido da fonte de luz em relação ao ponto atual.
-    vec4 l = normalize(spotlight-p);
-
-    vec4 p_l = normalize(vec4(0.0, -1.0, 0.0, 0.0));
 
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
+
+    vec4 l = v;
 
     // Vetor que define o sentido da reflexão especular ideal.
     //vec4 r = vec4(0.0,0.0,0.0,0.0); // PREENCHA AQUI o vetor de reflexão especular ideal
@@ -57,16 +55,16 @@ void main()
     vec3 Ka; // Refletância ambiente
     float q; // Expoente especular para o modelo de iluminação de Phong
 
-    if ( object_id == SPHERE )
-    {
-        // PREENCHA AQUI
-        // Propriedades espectrais da esfera
-        Kd = vec3(0.8,0.4,0.08);
-        Ks = vec3(0.0,0.0,0.0);
-        Ka = vec3(0.4,0.2,0.04);
-        q = 1.0;
-    }
-    else if ( object_id == BUNNY )
+    // if ( object_id == SPHERE )
+    // {
+    //     // PREENCHA AQUI
+    //     // Propriedades espectrais da esfera
+    //     Kd = vec3(0.8,0.4,0.08);
+    //     Ks = vec3(0.0,0.0,0.0);
+    //     Ka = vec3(0.4,0.2,0.04);
+    //     q = 1.0;
+    // }
+    if ( object_id == BUNNY )
     {
         // PREENCHA AQUI
         // Propriedades espectrais do coelho
@@ -84,13 +82,13 @@ void main()
         Ka = vec3(0.0,0.0,0.0);
         q = 20.0;
     }
-    else // Objeto desconhecido = preto
-    {
-        Kd = vec3(0.0,0.0,0.0);
-        Ks = vec3(0.0,0.0,0.0);
-        Ka = vec3(0.0,0.0,0.0);
-        q = 1.0;
-    }
+    // else // Objeto desconhecido = preto
+    // {
+    //     Kd = vec3(0.0,0.0,0.0);
+    //     Ks = vec3(0.0,0.0,0.0);
+    //     Ka = vec3(0.0,0.0,0.0);
+    //     q = 1.0;
+    // }
 
     // Espectro da fonte de iluminação
     vec3 I = vec3(1.0,1.0,1.0); // PREENCH AQUI o espectro da fonte de luz
@@ -109,13 +107,8 @@ void main()
 
     // Cor final do fragmento calculada com uma combinação dos termos difuso,
     // especular, e ambiente. Veja slide 129 do documento Aula_17_e_18_Modelos_de_Iluminacao.pdf.
-    
-    if (acos((dot(normalize(p-spotlight), p_l))) < 0.523599) {
     color = lambert_diffuse_term + ambient_term + phong_specular_term;
-    }
-    else {
-        color = ambient_term;
-    }
+
     // Cor final com correção gamma, considerando monitor sRGB.
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
     color = pow(color, vec3(1.0,1.0,1.0)/2.2);
