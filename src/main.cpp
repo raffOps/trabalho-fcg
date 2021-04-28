@@ -289,9 +289,9 @@ int main(int argc, char* argv[])
     LoadTextureImage("../../data/grama.jpg");
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
-    ObjModel spheremodel("../../data/sphere.obj");
-    ComputeNormals(&spheremodel);
-    BuildTrianglesAndAddToVirtualScene(&spheremodel);
+    ObjModel carmodel("../../data/car.obj");
+    ComputeNormals(&carmodel);
+    BuildTrianglesAndAddToVirtualScene(&carmodel);
 
     ObjModel bunnymodel("../../data/bunny.obj");
     ComputeNormals(&bunnymodel);
@@ -456,10 +456,11 @@ int main(int argc, char* argv[])
         #define CIMA 4
 
         // Desenhamos o modelo da esfera
-        model = Matrix_Translate(1.0f,0.0f,0.0f)
+        model = Matrix_Translate(1.0f,-0.2,0.0f)
               * Matrix_Translate(movimentacao_d_objeto - movimentacao_a_objeto, 
                                          0,
-                                        movimentacao_s_objeto - movimentacao_w_objeto);
+                                        movimentacao_s_objeto - movimentacao_w_objeto)
+             * Matrix_Rotate_Y(-1.5708);
               //* Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, CAR);
@@ -472,7 +473,7 @@ int main(int argc, char* argv[])
 
 
         // Desenhamos o modelo do coelho
-        model =         model = Matrix_Translate(-1.0f,0.0f,0.0f)
+        model =   model = Matrix_Translate(-1.0f,0.0f,0.0f)
               * Matrix_Rotate_Z(0.6f)
               * Matrix_Rotate_X(0.2f);
         
