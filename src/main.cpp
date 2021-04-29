@@ -305,6 +305,8 @@ int main(int argc, char* argv[])
     ComputeNormals(&lateral);
     BuildTrianglesAndAddToVirtualScene(&lateral);
 
+    //PrintObjModelInfo(&carmodel);
+
     // ObjModel lateral_direita("../../data/plane.obj");
     // ComputeNormals(&lateral_direita);
     // BuildTrianglesAndAddToVirtualScene(&lateral_direita);
@@ -366,15 +368,17 @@ int main(int argc, char* argv[])
         float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
         float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
 
-        float movimentacao_w_objeto = tecla_w_objeto * 0.05;
-        float movimentacao_a_objeto = tecla_a_objeto * 0.05;
-        float movimentacao_s_objeto = tecla_s_objeto * 0.05;
-        float movimentacao_d_objeto = tecla_d_objeto * 0.05;
+        float velocidade = 0.1;
 
-        float movimentacao_w_camera = tecla_w_camera * 0.05;
-        float movimentacao_a_camera = tecla_a_camera * 0.05;
-        float movimentacao_s_camera = tecla_s_camera * 0.05;
-        float movimentacao_d_camera = tecla_d_camera * 0.05;
+        float movimentacao_w_objeto = tecla_w_objeto * velocidade;
+        float movimentacao_a_objeto = tecla_a_objeto * velocidade;
+        float movimentacao_s_objeto = tecla_s_objeto * velocidade;
+        float movimentacao_d_objeto = tecla_d_objeto * velocidade;
+
+        float movimentacao_w_camera = tecla_w_camera * velocidade;
+        float movimentacao_a_camera = tecla_a_camera * velocidade;
+        float movimentacao_s_camera = tecla_s_camera * velocidade;
+        float movimentacao_d_camera = tecla_d_camera * velocidade;
         // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
 
@@ -454,8 +458,12 @@ int main(int argc, char* argv[])
         #define PLANE  2
         #define LATERAL 3
         #define CIMA 4
+        #define CAR_PLANE 5
+        #define EXAUSTOR 6
+        #define RODA 7
+        #define CILINDRO 8
 
-        // Desenhamos o modelo da esfera
+        // Desenhamos o modelo da carro
         model = Matrix_Translate(1.0f,-0.2,0.0f)
               * Matrix_Translate(movimentacao_d_objeto - movimentacao_a_objeto, 
                                          0,
@@ -463,13 +471,18 @@ int main(int argc, char* argv[])
              * Matrix_Rotate_Y(-1.5708);
               //* Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, CAR);
+        glUniform1i(object_id_uniform, CAR_PLANE);
         DrawVirtualObject("car_Plane.001");
+        glUniform1i(object_id_uniform, EXAUSTOR);
         DrawVirtualObject("exhaust_Cylinder.001");
+        glUniform1i(object_id_uniform, RODA);
         DrawVirtualObject("rear_wheel_Cylinder.003");
         DrawVirtualObject("front_wheel_Cylinder.003");
+        glUniform1i(object_id_uniform, CILINDRO);
         DrawVirtualObject("axle_Cylinder");
         DrawVirtualObject("axle.001_Cylinder.004");
+
+        //printf("%d", g_VirtualScene["car_Plane.001"].vertex_array_object_id);
 
 
         // Desenhamos o modelo do coelho

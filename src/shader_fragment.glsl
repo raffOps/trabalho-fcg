@@ -19,11 +19,16 @@ uniform mat4 view;
 uniform mat4 projection;
 
 // Identificador que define qual objeto está sendo desenhado no momento
-#define CAR 0
-#define BUNNY  1
-#define PLANE  2
-#define LATERAL 3
-#define LATERAL_ 4
+
+        #define CAR 0
+        #define BUNNY  1
+        #define PLANE  2
+        #define LATERAL 3
+        #define CIMA 4
+        #define CAR_PLANE 5
+        #define EXAUSTOR 6
+        #define RODA 7
+        #define CILINDRO 8
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -34,6 +39,8 @@ uniform vec4 bbox_max;
 uniform sampler2D TextureImage0;
 uniform sampler2D TextureImage1;
 //uniform sampler2D TextureImage2;
+
+//uniform ObjModel carro;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
@@ -69,7 +76,95 @@ void main()
     // Coordenadas de textura U e V
     float U = 0.0;
     float V = 0.0;
+    if (object_id == CAR_PLANE){
+                // PREENCHA AQUI as coordenadas de textura do coelho, computadas com
+        // projeção planar XY em COORDENADAS DO MODELO. Utilize como referência
+        // o slides 99-104 do documento Aula_20_Mapeamento_de_Texturas.pdf,
+        // e também use as variáveis min*/max* definidas abaixo para normalizar
+        // as coordenadas de textura U e V dentro do intervalo [0,1]. Para
+        // tanto, veja por exemplo o mapeamento da variável 'p_v' utilizando
+        // 'h' no slides 158-160 do documento Aula_20_Mapeamento_de_Texturas.pdf.
+        // Veja também a Questão 4 do Questionário 4 no Moodle.
 
+        v = normalize(camera_position - p);
+
+        vec4 l = v;
+
+        // Vetor que define o sentido da reflexão especular ideal.
+        //vec4 r = vec4(0.0,0.0,0.0,0.0); // PREENCHA AQUI o vetor de reflexão especular ideal
+        vec4 r = -1*l + 2*n*dot(n,l); 
+        // Parâmetros que definem as propriedades espectrais da superfície
+        vec3 Kd; // Refletância difusa
+        vec3 Ks; // Refletância especular
+        vec3 Ka; // Refletância ambiente
+        float q; // Expoente especular para o modelo de iluminação de Phong
+        Kd = vec3(1.0,0.0,0.02);
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = vec3(0.04,0.2,0.2);
+        q = 1.0;
+        vec3 I = vec3(1.0,1.0,1.0); // PREENCH AQUI o espectro da fonte de luz
+
+        // Espectro da luz ambiente
+        vec3 Ia = vec3(0.2,0.2,0.2); // PREENCHA AQUI o espectro da luz ambiente
+
+        // Termo difuso utilizando a lei dos cossenos de Lambert
+        vec3 lambert_diffuse_term = Kd * I * max(0, dot(n, l)); // PREENCHA AQUI o termo difuso de Lambert
+
+        // Termo ambiente
+        vec3 ambient_term = Ka * Ia; // PREENCHA AQUI o termo ambiente
+
+        // Termo especular utilizando o modelo de iluminação de Phong
+        vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q); // PREENCH AQUI o termo especular de Phong
+
+        // Cor final do fragmento calculada com uma combinação dos termos difuso,
+        // especular, e ambiente. Veja slide 129 do documento Aula_17_e_18_Modelos_de_Iluminacao.pdf.
+        color = lambert_diffuse_term + phong_specular_term;
+
+        // Cor final com correção gamma, considerando monitor sRGB.
+        // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
+        color = pow(color, vec3(1.0,1.0,1.0)/2.2);
+    }
+
+    if (object_id == RODA) {
+                v = normalize(camera_position - p);
+
+        vec4 l = v;
+
+        // Vetor que define o sentido da reflexão especular ideal.
+        //vec4 r = vec4(0.0,0.0,0.0,0.0); // PREENCHA AQUI o vetor de reflexão especular ideal
+        vec4 r = -1*l + 2*n*dot(n,l); 
+        // Parâmetros que definem as propriedades espectrais da superfície
+        vec3 Kd; // Refletância difusa
+        vec3 Ks; // Refletância especular
+        vec3 Ka; // Refletância ambiente
+        float q; // Expoente especular para o modelo de iluminação de Phong
+        Kd = vec3(0.0,0.0,0.0);
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = vec3(0.04,0.2,0.2);
+        q = 32.0;
+        vec3 I = vec3(1.0,1.0,1.0); // PREENCH AQUI o espectro da fonte de luz
+
+        // Espectro da luz ambiente
+        vec3 Ia = vec3(0.2,0.2,0.2); // PREENCHA AQUI o espectro da luz ambiente
+
+        // Termo difuso utilizando a lei dos cossenos de Lambert
+        vec3 lambert_diffuse_term = Kd * I * max(0, dot(n, l)); // PREENCHA AQUI o termo difuso de Lambert
+
+        // Termo ambiente
+        vec3 ambient_term = Ka * Ia; // PREENCHA AQUI o termo ambiente
+
+        // Termo especular utilizando o modelo de iluminação de Phong
+        vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q); // PREENCH AQUI o termo especular de Phong
+
+        // Cor final do fragmento calculada com uma combinação dos termos difuso,
+        // especular, e ambiente. Veja slide 129 do documento Aula_17_e_18_Modelos_de_Iluminacao.pdf.
+        color = lambert_diffuse_term + phong_specular_term;
+
+        // Cor final com correção gamma, considerando monitor sRGB.
+        // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
+        color = pow(color, vec3(1.0,1.0,1.0)/2.2);
+
+    }
     if ( object_id == CAR )
     {
         // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
@@ -94,6 +189,14 @@ void main()
 
         U = (o+M_PI) / (2 * M_PI);
         V = (q+M_PI_2)/M_PI;
+        
+        // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
+        vec3 Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
+        //vec3 Kd1 = texture(TextureImage2, vec2(U,V)).rgb;
+        // Equação de Iluminação
+        float lambert = max(0,dot(n,l));
+
+        color = Kd0 * (lambert + 0.01);
     }
     else if ( object_id == BUNNY )
     {
