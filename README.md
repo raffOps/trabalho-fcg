@@ -2,7 +2,7 @@
 
 ```
 |-----------------------------------------------------+-----------|
-| Critérios Técnicos                                  | Pontuação |
+| Critérios Técnicos                                  | Completo  |
 |-----------------------------------------------------+-----------|
 | Malhas poligonais complexas                         |     100%  |
 | Transformações geométricas controladas pelo usuário |     100%  |
@@ -10,12 +10,12 @@
 | Instâncias de objetos                               |     100%  |
 | Três tipos de testes de intersecção                 |     10%   |
 | Modelos de Iluminação Difusa e Blinn-Phong          |     80%   |
-| Modelos de Interpolação de Phong e oGuraud          |           |
+| Modelos de Interpolação de Phong e oGuraud          |     0%    |
 | Mapeamento de texturas                              |     80%   |
-| Movimentação com curva Bézier cúbica                |           |
-| Animações baseadas no tempo ($\Delta t$)            |           |
+| Movimentação com curva Bézier cúbica                |     0%    |
+| Animações baseadas no tempo ($\Delta t$)            |     0%    |
 | Uso de Git para entrega do código fonte do trabalho |     100%  |
-| Fazer uma logica no jogo                            |     100%  |
+| Fazer uma logica no jogo                            |     10%   |
 |-----------------------------------------------------+-----------|
 ```
 Mapeamento de texturas 
