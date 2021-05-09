@@ -287,6 +287,7 @@ int main(int argc, char* argv[])
     //LoadTextureImage("../../data/tc-earth_nightmap_citylights.gif"); // TextureImage1
     LoadTextureImage("../../data/asfalto.jpg");
     LoadTextureImage("../../data/grama.jpg");
+    LoadTextureImage("../../data/chegada.jpg");
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel carmodel("../../data/car.obj");
@@ -368,7 +369,7 @@ int main(int argc, char* argv[])
         float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
         float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
 
-        float velocidade = 0.1;
+        float velocidade = 0.5;
 
         float movimentacao_w_objeto = tecla_w_objeto * velocidade;
         float movimentacao_a_objeto = tecla_a_objeto * velocidade;
@@ -462,9 +463,10 @@ int main(int argc, char* argv[])
         #define EXAUSTOR 6
         #define RODA 7
         #define CILINDRO 8
+        #define CHEGADA 9
 
         // Desenhamos o modelo da carro
-        model = Matrix_Translate(1.0f,-0.2,0.0f)
+        model = Matrix_Translate(1.0f,-0.2,-90.0f)
               * Matrix_Translate(movimentacao_d_objeto - movimentacao_a_objeto, 
                                          0,
                                         movimentacao_s_objeto - movimentacao_w_objeto)
@@ -486,20 +488,38 @@ int main(int argc, char* argv[])
 
 
         // Desenhamos o modelo do coelho
-        model =   model = Matrix_Translate(-1.0f,0.0f,0.0f)
-              * Matrix_Rotate_Z(0.6f)
-              * Matrix_Rotate_X(0.2f);
+
+        int distancia_coelho = -5;
+        for(distancia_coelho=-5; distancia_coelho>-95; distancia_coelho-=15){
+            model = Matrix_Translate(0.0f,0.0f,distancia_coelho);
+            
+            glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(object_id_uniform, BUNNY);
+            DrawVirtualObject("bunny");
+        }
+
+
+        // model = Matrix_Translate(0.0f,0.0f,-7.0f);
         
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, BUNNY);
-        DrawVirtualObject("bunny");
+        // glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        // glUniform1i(object_id_uniform, BUNNY);
+        // DrawVirtualObject("bunny");
+
+        
 
         // Desenhamos o plano do chão
-        model = Matrix_Translate(0.0f,-1.1f,0.0f)
-                * Matrix_Scale(5, 1, 100);
+        // model = Matrix_Translate(0.0f,-1.1f,0.0f)
+        //         * Matrix_Scale(5, 1, 100);
+        // glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        // glUniform1i(object_id_uniform, PLANE);
+        // DrawVirtualObject("plane");
+
+        // Desenhamos a chegada da pista no chão
+        model = Matrix_Translate(0.0f,-0.2f,-5.0f)
+                * Matrix_Scale(2, 1, 4);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane");
+        glUniform1i(object_id_uniform, CHEGADA);
+        DrawVirtualObject("chegada");
 
 
         model = Matrix_Translate(5.0f,1.1f,0.0f)

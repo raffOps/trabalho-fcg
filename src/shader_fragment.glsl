@@ -29,6 +29,7 @@ uniform mat4 projection;
         #define EXAUSTOR 6
         #define RODA 7
         #define CILINDRO 8
+        #define CHEGADA 9
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -38,7 +39,7 @@ uniform vec4 bbox_max;
 // Variáveis para acesso das imagens de textura
 uniform sampler2D TextureImage0;
 uniform sampler2D TextureImage1;
-//uniform sampler2D TextureImage2;
+uniform sampler2D TextureImage2;
 
 //uniform ObjModel carro;
 
@@ -76,6 +77,23 @@ void main()
     // Coordenadas de textura U e V
     float U = 0.0;
     float V = 0.0;
+
+    if (object_id == CHEGADA){
+        //printf("chegada");
+        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
+        U = texcoords.x;
+        V = texcoords.y;
+    
+
+        // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
+        vec3 Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
+        //vec3 Kd1 = texture(TextureImage2, vec2(U,V)).rgb;
+        // Equação de Iluminação
+        float lambert = max(0,dot(n,l));
+
+        color = Kd0 * (lambert + 0.01);
+        }
+
     if (object_id == CAR_PLANE){
                 // PREENCHA AQUI as coordenadas de textura do coelho, computadas com
         // projeção planar XY em COORDENADAS DO MODELO. Utilize como referência
@@ -165,39 +183,39 @@ void main()
         color = pow(color, vec3(1.0,1.0,1.0)/2.2);
 
     }
-    if ( object_id == CAR )
-    {
-        // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
-        // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência
-        // o slides 134-150 do documento Aula_20_Mapeamento_de_Texturas.pdf.
-        // A esfera que define a projeção deve estar centrada na posição
-        // "bbox_center" definida abaixo.
+    // if ( object_id == CAR )
+    // {
+    //     // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
+    //     // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência
+    //     // o slides 134-150 do documento Aula_20_Mapeamento_de_Texturas.pdf.
+    //     // A esfera que define a projeção deve estar centrada na posição
+    //     // "bbox_center" definida abaixo.
 
-        // Você deve utilizar:
-        //   função 'length( )' : comprimento Euclidiano de um vetor
-        //   função 'atan( , )' : arcotangente. Veja https://en.wikipedia.org/wiki/Atan2.
-        //   função 'asin( )'   : seno inverso.
-        //   constante M_PI
-        //   variável position_model
-        float raio = 0.3f;
-        vec4 bbox_centro = (bbox_min + bbox_max) / 2.0;
-        vec4 p_linha = bbox_centro + raio * (normalize(position_model - bbox_centro));
-        vec4 p_vetor = p_linha - bbox_centro;
+    //     // Você deve utilizar:
+    //     //   função 'length( )' : comprimento Euclidiano de um vetor
+    //     //   função 'atan( , )' : arcotangente. Veja https://en.wikipedia.org/wiki/Atan2.
+    //     //   função 'asin( )'   : seno inverso.
+    //     //   constante M_PI
+    //     //   variável position_model
+    //     float raio = 0.3f;
+    //     vec4 bbox_centro = (bbox_min + bbox_max) / 2.0;
+    //     vec4 p_linha = bbox_centro + raio * (normalize(position_model - bbox_centro));
+    //     vec4 p_vetor = p_linha - bbox_centro;
 
-        float o = atan(p_vetor.x, p_vetor.z);
-        float q = asin(p_vetor.y/raio);
+    //     float o = atan(p_vetor.x, p_vetor.z);
+    //     float q = asin(p_vetor.y/raio);
 
-        U = (o+M_PI) / (2 * M_PI);
-        V = (q+M_PI_2)/M_PI;
+    //     U = (o+M_PI) / (2 * M_PI);
+    //     V = (q+M_PI_2)/M_PI;
         
-        // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        vec3 Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
-        //vec3 Kd1 = texture(TextureImage2, vec2(U,V)).rgb;
-        // Equação de Iluminação
-        float lambert = max(0,dot(n,l));
+    //     // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
+    //     vec3 Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
+    //     //vec3 Kd1 = texture(TextureImage2, vec2(U,V)).rgb;
+    //     // Equação de Iluminação
+    //     float lambert = max(0,dot(n,l));
 
-        color = Kd0 * (lambert + 0.01);
-    }
+    //     color = Kd0 * (lambert + 0.01);
+    // }
     else if ( object_id == BUNNY )
     {
         // PREENCHA AQUI as coordenadas de textura do coelho, computadas com
@@ -241,7 +259,7 @@ void main()
 
         // Cor final do fragmento calculada com uma combinação dos termos difuso,
         // especular, e ambiente. Veja slide 129 do documento Aula_17_e_18_Modelos_de_Iluminacao.pdf.
-        color = lambert_diffuse_term + ambient_term + phong_specular_term;
+        color = lambert_diffuse_term + ambient_term; //+ phong_specular_term;
 
         // Cor final com correção gamma, considerando monitor sRGB.
         // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
