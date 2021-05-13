@@ -423,7 +423,7 @@ int main(int argc, char* argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -30.0f; // Posição do "far plane"
+        float farplane  = -60.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
@@ -466,7 +466,7 @@ int main(int argc, char* argv[])
         #define CHEGADA 9
 
         // Desenhamos o modelo da carro
-        model = Matrix_Translate(1.0f,-0.2,-90.0f)
+        model = Matrix_Translate(0.0f,-0.2, 0.0f)
               * Matrix_Translate(movimentacao_d_objeto - movimentacao_a_objeto, 
                                          0,
                                         movimentacao_s_objeto - movimentacao_w_objeto)
@@ -490,29 +490,21 @@ int main(int argc, char* argv[])
         // Desenhamos o modelo do coelho
 
         int distancia_coelho = -5;
-        for(distancia_coelho=-5; distancia_coelho>-95; distancia_coelho-=15){
+        for(distancia_coelho=-10; distancia_coelho>-95; distancia_coelho-=15){
             model = Matrix_Translate(0.0f,0.0f,distancia_coelho);
             
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, BUNNY);
             DrawVirtualObject("bunny");
         }
-
-
-        // model = Matrix_Translate(0.0f,0.0f,-7.0f);
-        
-        // glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        // glUniform1i(object_id_uniform, BUNNY);
-        // DrawVirtualObject("bunny");
-
         
 
-        // Desenhamos o plano do chão
-        // model = Matrix_Translate(0.0f,-1.1f,0.0f)
-        //         * Matrix_Scale(5, 1, 100);
-        // glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        // glUniform1i(object_id_uniform, PLANE);
-        // DrawVirtualObject("plane");
+        //Desenhamos o plano do chão
+        model = Matrix_Translate(0.0f,-1.1f,0.0f)
+                * Matrix_Scale(5, 1, 100);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANE);
+        DrawVirtualObject("plane");
 
         // Desenhamos a chegada da pista no chão
         model = Matrix_Translate(0.0f,-0.2f,-5.0f)
