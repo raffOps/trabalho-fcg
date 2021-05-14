@@ -205,9 +205,11 @@ int tecla_d_camera = 0;
 
 bool is_look_at = true;
 
-float t_coelho = 0.0;
+double t_coelho = 0.0;
 bool semi_circulo_superior = true;
 int sentido_z = -1;
+
+double cronometro_inicio = glfwGetTime();
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 // Número de texturas carregadas pela função LoadTextureImage()
@@ -493,8 +495,26 @@ int main(int argc, char* argv[])
 
         // Desenhamos o modelo do coelho
 
-        if (t_coelho > 1){
-            t_coelho = 0;
+        int ciclo = 8;
+
+        double agora = glfwGetTime();
+
+        double delta = agora - cronometro_inicio;
+
+        double modulo_delta = remainder(delta, ciclo/2);
+        double modulo_delta_corrigido;
+        if (modulo_delta < 0){
+            modulo_delta_corrigido = -1*modulo_delta + (ciclo/4 + modulo_delta)*2;
+        }
+        else {
+            modulo_delta_corrigido = modulo_delta;
+        }
+        t_coelho = modulo_delta_corrigido / (ciclo / 2);
+
+        //printf("%f     %f    %f", delta, modulo_delta, t_coelho);
+        //printf("\n");
+        if (t_coelho > 0.95){
+            cronometro_inicio = glfwGetTime();
             if (semi_circulo_superior == true){
                 semi_circulo_superior = false;
                 sentido_z = 1; 
@@ -506,9 +526,11 @@ int main(int argc, char* argv[])
         }
 
 
+        int raio_z_circulo = 4;
+
         glm::vec4 ancora_1 = glm::vec4(sentido_z * -4, 0, 0, 1);
-        glm::vec4 ancora_2 = glm::vec4(sentido_z * -2, 0,  sentido_z * 3, 1);
-        glm::vec4 ancora_3 = glm::vec4(sentido_z * 2, 0, sentido_z * 3, 1);
+        glm::vec4 ancora_2 = glm::vec4(sentido_z * -2, 0,  sentido_z * raio_z_circulo, 1);
+        glm::vec4 ancora_3 = glm::vec4(sentido_z * 2, 0, sentido_z * raio_z_circulo, 1);
         glm::vec4 ancora_4 = glm::vec4(sentido_z * 4, 0, 0, 1);
 
         float b_0_3 = pow(1-t_coelho, 3);
@@ -525,8 +547,6 @@ int main(int argc, char* argv[])
         glm::vec4 c4 = b_3_3 * ancora_4;
 
         glm::vec4 c = c1 + c2 + c3 + c4;
-
-        t_coelho += 0.0005;
 
         int distancia_coelho = -5;
         for(distancia_coelho=-10; distancia_coelho>-95; distancia_coelho-=15){

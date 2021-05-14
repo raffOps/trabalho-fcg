@@ -12,8 +12,8 @@
 | Modelos de Iluminação Difusa e Blinn-Phong          |     80%   |
 | Modelos de Interpolação de Phong e oGuraud          |     0%    |
 | Mapeamento de texturas                              |     80%   |
-| Movimentação com curva Bézier cúbica                |     0%    |
-| Animações baseadas no tempo ($\Delta t$)            |     0%    |
+| Movimentação com curva Bézier cúbica                |     100%  |
+| Animações baseadas no tempo ($\Delta t$)            |     100%  |
 | Uso de Git para entrega do código fonte do trabalho |     100%  |
 | Fazer uma logica no jogo                            |     10%   |
 |-----------------------------------------------------+-----------|
