@@ -203,8 +203,12 @@ int tecla_s_camera = 0;
 int tecla_a_camera = 0;
 int tecla_d_camera = 0;
 
-
 bool is_look_at = true;
+
+float t_coelho = 0.0;
+bool semi_circulo_superior = true;
+int sentido_z = -1;
+
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
@@ -392,7 +396,7 @@ int main(int argc, char* argv[])
             camera_position_c  = glm::vec4(x+movimentacao_d_camera-movimentacao_a_camera,y,z+movimentacao_s_camera-movimentacao_w_camera+3, 1.0f); 
             camera_lookat_l    = glm::vec4(movimentacao_d_camera-movimentacao_a_camera, 0, movimentacao_s_camera-movimentacao_w_camera, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_view_vector = camera_lookat_l - camera_position_c;
-            camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+            camera_up_vector   = glm::vec4(0.0f,2.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
         }
 
         else {
@@ -466,7 +470,7 @@ int main(int argc, char* argv[])
         #define CHEGADA 9
 
         // Desenhamos o modelo da carro
-        model = Matrix_Translate(0.0f,-0.2, 0.0f)
+        model = Matrix_Translate(1.0f,-0.2, 0.0f)
               * Matrix_Translate(movimentacao_d_objeto - movimentacao_a_objeto, 
                                          0,
                                         movimentacao_s_objeto - movimentacao_w_objeto)
@@ -489,9 +493,47 @@ int main(int argc, char* argv[])
 
         // Desenhamos o modelo do coelho
 
+        if (t_coelho > 1){
+            t_coelho = 0;
+            if (semi_circulo_superior == true){
+                semi_circulo_superior = false;
+                sentido_z = 1; 
+            }
+            else {
+                semi_circulo_superior = true;
+                sentido_z = -1;
+            }
+        }
+
+
+        glm::vec4 ancora_1 = glm::vec4(sentido_z * -4, 0, 0, 1);
+        glm::vec4 ancora_2 = glm::vec4(sentido_z * -2, 0,  sentido_z * 3, 1);
+        glm::vec4 ancora_3 = glm::vec4(sentido_z * 2, 0, sentido_z * 3, 1);
+        glm::vec4 ancora_4 = glm::vec4(sentido_z * 4, 0, 0, 1);
+
+        float b_0_3 = pow(1-t_coelho, 3);
+        float b_1_3 = 3 * t_coelho * pow(1-t_coelho, 2);
+        float b_2_3 = 3 * pow(t_coelho, 2) * pow(1-t_coelho, 2);
+        float b_3_3 = pow(t_coelho, 3);
+
+        glm::vec4 c1 = b_0_3 * ancora_1;
+
+        glm:: vec4 c2 = b_1_3 * ancora_2;
+
+        glm::vec4 c3 = b_2_3 * ancora_3;
+
+        glm::vec4 c4 = b_3_3 * ancora_4;
+
+        glm::vec4 c = c1 + c2 + c3 + c4;
+
+        t_coelho += 0.0005;
+
         int distancia_coelho = -5;
         for(distancia_coelho=-10; distancia_coelho>-95; distancia_coelho-=15){
-            model = Matrix_Translate(0.0f,0.0f,distancia_coelho);
+            model = Matrix_Translate(c.x,0.0f,c.z + distancia_coelho);
+            if (semi_circulo_superior == false){
+                model = model * Matrix_Rotate_Y(3.14159);
+            }
             
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, BUNNY);
@@ -508,7 +550,7 @@ int main(int argc, char* argv[])
 
         // Desenhamos a chegada da pista no chão
         model = Matrix_Translate(0.0f,-0.2f,-5.0f)
-                * Matrix_Scale(2, 1, 4);
+                * Matrix_Scale(2, 2, 4);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, CHEGADA);
         DrawVirtualObject("chegada");
