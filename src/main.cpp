@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
     // Criamos uma janela do sistema operacional, com 800 colunas e 600 linhas
     // de pixels, e com título "INF01047 ...".
     GLFWwindow* window;
-    window = glfwCreateWindow(800, 600, "INF01047 - 265830 - RAFAEL JUNIOR RIBEIRO", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "287693 - Demétrio Boeira 287693 | 265830 - Rafael Júnior Ribeiro", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -395,10 +395,10 @@ int main(int argc, char* argv[])
         glm::vec4 camera_up_vector;
         
         if(is_look_at) {
-            camera_position_c  = glm::vec4(x+movimentacao_d_camera-movimentacao_a_camera,y,z+movimentacao_s_camera-movimentacao_w_camera+3, 1.0f); 
+            camera_position_c  = glm::vec4(x+movimentacao_d_camera-movimentacao_a_camera,y+3,z+movimentacao_s_camera-movimentacao_w_camera+3, 1.0f); 
             camera_lookat_l    = glm::vec4(movimentacao_d_camera-movimentacao_a_camera, 0, movimentacao_s_camera-movimentacao_w_camera, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_view_vector = camera_lookat_l - camera_position_c;
-            camera_up_vector   = glm::vec4(0.0f,2.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+            camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
         }
 
         else {
@@ -414,10 +414,10 @@ int main(int argc, char* argv[])
             w = w / norm(w);
             u = u / norm(u);
 
-            camera_position_c = camera_position_c - Matrix_Scale(movimentacao_w_camera, movimentacao_w_camera, movimentacao_w_camera)*w;
-            camera_position_c = camera_position_c + Matrix_Scale(movimentacao_s_camera, movimentacao_s_camera, movimentacao_s_camera)*w;
-            camera_position_c = camera_position_c - Matrix_Scale(movimentacao_a_camera, movimentacao_a_camera, movimentacao_a_camera)*u;
-            camera_position_c = camera_position_c + Matrix_Scale(movimentacao_d_camera, movimentacao_d_camera, movimentacao_d_camera)*u;
+            camera_position_c = camera_position_c - movimentacao_w_camera*w;
+            camera_position_c = camera_position_c + movimentacao_s_camera*w;
+            camera_position_c = camera_position_c - movimentacao_a_camera*u;
+            camera_position_c = camera_position_c + movimentacao_d_camera*u;
         }
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -470,6 +470,7 @@ int main(int argc, char* argv[])
         #define RODA 7
         #define CILINDRO 8
         #define CHEGADA 9
+        #define BUNNY_PHONG  10
 
         // Desenhamos o modelo da carro
         model = Matrix_Translate(1.0f,-0.2, 0.0f)
@@ -493,7 +494,8 @@ int main(int argc, char* argv[])
         //printf("%d", g_VirtualScene["car_Plane.001"].vertex_array_object_id);
 
 
-        // Desenhamos o modelo do coelho
+        // Desenhamos o modelo dos coelhos com curvas de bezien a animacao baseada
+        // no tempo
 
         int ciclo = 8;
 
@@ -511,8 +513,6 @@ int main(int argc, char* argv[])
         }
         t_coelho = modulo_delta_corrigido / (ciclo / 2);
 
-        //printf("%f     %f    %f", delta, modulo_delta, t_coelho);
-        //printf("\n");
         if (t_coelho > 0.95){
             cronometro_inicio = glfwGetTime();
             if (semi_circulo_superior == true){
@@ -555,11 +555,14 @@ int main(int argc, char* argv[])
                 model = model * Matrix_Rotate_Y(3.14159);
             }
             
+
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-            glUniform1i(object_id_uniform, BUNNY);
+            if(remainder(distancia_coelho, 10) == 0)
+                glUniform1i(object_id_uniform, BUNNY);
+            else
+                glUniform1i(object_id_uniform, BUNNY_PHONG);
             DrawVirtualObject("bunny");
         }
-        
 
         //Desenhamos o plano do chão
         model = Matrix_Translate(0.0f,-1.1f,0.0f)
